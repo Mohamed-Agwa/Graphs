@@ -1,0 +1,161 @@
+package graphs;
+
+import java.io.*; 
+import java.util.*; 
+  
+class MST
+{ 
+    static Scanner in = new Scanner(new InputStreamReader(System.in));
+    static final int INF = Integer.MAX_VALUE; 
+    class AdjListNode 
+    { 
+        private int v; 
+        private int weight; 
+        AdjListNode(int _v, int _w) { v = _v;  weight = _w; } 
+        int getV() { return v; } 
+        int getWeight()  { return weight; } 
+    } 
+  
+    // Class to represent graph as an adjcency list of 
+    // nodes of type AdjListNode 
+    class Graph 
+    { 
+        private int V; 
+        private LinkedList<AdjListNode>adj[]; 
+        Graph(int v) 
+        { 
+            V=v; 
+            adj = new LinkedList[V]; 
+            for (int i=0; i<v; ++i) 
+                adj[i] = new LinkedList<AdjListNode>(); 
+        } 
+        void addEdge(int u, int v, int weight) 
+        { 
+            AdjListNode node = new AdjListNode(v,weight); 
+            adj[u].add(node);// Add v to u's list 
+        } 
+  
+        // A recursive function used by shortestPath. 
+        // See below link for details 
+        void topologicalSortUtil(int v, Boolean visited[], Stack stack) 
+        { 
+            // Mark the current node as visited. 
+            visited[v] = true; 
+            Integer i; 
+  
+            // Recur for all the vertices adjacent to this vertex 
+            Iterator<AdjListNode> it = adj[v].iterator(); 
+            while (it.hasNext()) 
+            { 
+                AdjListNode node =it.next(); 
+                if (!visited[node.getV()]) 
+                    topologicalSortUtil(node.getV(), visited, stack); 
+            } 
+            // Push current vertex to stack which stores result 
+            stack.push(new Integer(v)); 
+        } 
+  
+        // The function to find shortest paths from given vertex. It 
+        // uses recursive topologicalSortUtil() to get topological 
+        // sorting of given graph. 
+        void shortestPath(int s) 
+        { 
+            Stack stack = new Stack(); 
+            int dist[] = new int[V]; 
+  
+            // Mark all the vertices as not visited 
+            Boolean visited[] = new Boolean[V]; 
+            for (int i = 0; i < V; i++) 
+                visited[i] = false; 
+  
+            // Call the recursive helper function to store Topological 
+            // Sort starting from all vertices one by one 
+            for (int i = 0; i < V; i++) 
+                if (visited[i] == false) 
+                    topologicalSortUtil(i, visited, stack); 
+  
+            // Initialize distances to all vertices as infinite and 
+            // distance to source as 0 
+            for (int i = 0; i < V; i++) 
+                dist[i] = INF; 
+            dist[s] = 0; 
+  
+            // Process vertices in topological order 
+            while (stack.empty() == false) 
+            { 
+                // Get the next vertex from topological order 
+                int u = (int)stack.pop(); 
+  
+                // Update distances of all adjacent vertices 
+                Iterator<AdjListNode> it; 
+                if (dist[u] != INF) 
+                { 
+                    it = adj[u].iterator(); 
+                    while (it.hasNext()) 
+                    { 
+                        AdjListNode i= it.next(); 
+                        if (dist[i.getV()] > dist[u] + i.getWeight()) 
+                            dist[i.getV()] = dist[u] + i.getWeight(); 
+                    } 
+                } 
+            } 
+  
+            // Print the calculated shortest distances 
+            for (int i = 0; i < V; i++) 
+            { 
+                if (dist[i] == INF) 
+                    System.out.print( "INF "); 
+                else
+                    System.out.print( dist[i] + " "); 
+            } 
+        } 
+    } 
+  
+    Graph newGraph(int number) 
+    { 
+        return new Graph(number); 
+    } 
+  
+    public static void run() 
+    { 
+        // Create a graph given in the above diagram.  Here vertex 
+        // numbers are 0, 1, 2, 3, 4, 5 with following mappings: 
+        // 0=r, 1=s, 2=t, 3=x, 4=y, 5=z 
+        MST t = new MST(); 
+        boolean negative = false;
+        System.out.println("Please enter # of nodes");
+        int n = in.nextInt();                
+        Graph g = t.newGraph(n);
+        System.out.println("Please enter # of edges");
+        int ed = in.nextInt();
+        
+        
+        for(int i=0 ; i < ed ; i++)
+        {
+            System.out.println("For edge " + (i+1) + " Enter start node");
+            int start = in.nextInt();
+            System.out.println("For edge " + (i+1) + " Enter end node");
+            int end = in.nextInt();
+            System.out.println("For edge " + (i+1) + " Enter weight");
+            int weight = in.nextInt();
+            if(weight <0)
+                negative = true;
+            while(negative)
+            {
+                System.out.println("Negative weight isn't allowed. Try again.");
+                System.out.println("For edge " + (i+1) + "Enter weight");
+                weight = in.nextInt();
+                if(weight>0)
+                    negative=false;
+            }
+            g.addEdge(start, end, weight);
+        }
+        
+        System.out.println("There are " + n + " nodes.");
+        System.out.println("Please enter the source as a number between 1 and " + n);        
+        int s = in.nextInt(); 
+        System.out.println("Following are shortest distances "+ 
+                            "from source " + s ); 
+        g.shortestPath(s-1); 
+    } 
+} 
