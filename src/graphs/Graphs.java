@@ -6,8 +6,6 @@
 package graphs;
 
 import java.io.IOException;
-import java.util.InputMismatchException;
-import java.util.Scanner;
 
 /**
  *
@@ -22,19 +20,19 @@ public class Graphs {
         Choice choice = new Choice(graph);
         while(choice.visible)
         {
-            System.out.println("GUI still visible");
+            System.out.println("GUI still visible");            
         }
         for(int i=0; i<1000;i++)
         System.out.println("");
         if(graph.decision)
         {
-            System.out.println("Dijkstra's Algorithm");
+            System.out.println("Prim's Algorithm");
             MST.run();
         }
         else
         {
             System.out.println("Shortest Path Algorithm");
-            SPA.start();
+            SPA.run();
         }
     }
 }
